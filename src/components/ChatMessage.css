@@ -1,0 +1,31 @@
+/* ChatMessage.css */
+/* ChatMessage.css */
+
+.chat-message {
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    max-width: 80%; /* Limit message width for readability */
+  }
+  
+  .user {
+    background-color: #D6EAF8; /* Light blue for user messages */
+    align-self: flex-end; /* Right-align user messages */
+  }
+  
+  .chatbot {
+    background-color: #E8F6F3; /* Light green for chatbot messages */
+    align-self: flex-start; /* Left-align chatbot messages */
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
