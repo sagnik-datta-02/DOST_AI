@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef } from 'react';
 import { Paper, Typography, TextField, Button, List, ListItem, Container, ArrowBack , Grid} from '@mui/material';
+import axios from 'axios';
 import ChatMessage from './components/ChatMessage';
 
 
@@ -38,9 +39,11 @@ function ChatBotApp() {
   const [positiveSentiments, setPositiveSentiments] = useState([]);
   const [negativeSentiments, setNegativeSentiments] = useState([]);
   const [userResponses, setUserResponses] = useState([]);
+  const chatContainerRef = useRef(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
-    const updatedMessageHistory = messageHistory.slice(); // Create a copy of the message history
+    const updatedMessageHistory = messageHistory.slice(); 
     if (currentQuestionIndex < questions.length) {
       updatedMessageHistory.push({
         message: questions[currentQuestionIndex],
@@ -52,7 +55,7 @@ function ChatBotApp() {
 
   const handleUserResponse = async () => {
     try {
-      console.log(userInput); // Log the user's response
+      console.log(userInput); 
       setMessageHistory((prevHistory) => [
         ...prevHistory,
         { message: userInput, isUser: true },
@@ -73,8 +76,22 @@ function ChatBotApp() {
       } else {
         calculateAverageSentiments();
       }
+      setUserInput('');
     } catch (error) {
       console.error('Error analyzing sentiment:', error);
+    }
+    if (currentQuestionIndex === questions.length) {
+      try {
+        // Send POST request to the specified URL
+        await axios.post('https://chatu-rf63-git-master-swapnendu003.vercel.app/api/calls/makeCall', {
+          phoneNumber: phoneNumber,
+          
+        });
+
+        console.log('SMS sent successfully');
+      } catch (error) {
+        console.error('Error sending SMS:', error);
+      }
     }
   };
 
@@ -107,21 +124,26 @@ function ChatBotApp() {
     const total = values.reduce((sum, value) => sum + value, 0);
     return total / values.length;
   };
-
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      handleUserResponse();
+    }
+  };
 
   return (
     <Container maxWidth="md" style={{ marginTop: '40px' }}>
-  <Paper elevation={3} style={{ padding: '20px', height: '80vh', overflowY: 'auto' }}>
+  <Paper elevation={3} style={{ margin:'20px',padding: '20px', height: '100vh', overflowY: 'auto' }}>
     {/* Header */}
     <Grid container justifyContent="space-between" alignItems="center" marginBottom="20px">
       <Typography variant="h4" align="center">
-        MedAid Dost
+        MedAid Disha
       </Typography>
       {currentQuestionIndex === questions.length && (
         <Button
           variant="outlined"
           color="primary"
-          onClick={() => window.location.reload()} // Reload the page to go back to the "home"
+          onClick={() => window.location.reload()} 
         >
           Go to Home
         </Button>
@@ -155,6 +177,7 @@ function ChatBotApp() {
           fullWidth
           value={userInput}
           onChange={(event) => setUserInput(event.target.value)}
+          onKeyDown={handleKeyDown}
           sx={{ marginTop: '10px' }}
         />
         <Button
@@ -171,11 +194,38 @@ function ChatBotApp() {
     {/* Chatbot Finished */}
     {currentQuestionIndex === questions.length && (
       <div>
-        <Typography variant="h6">Chatbot</Typography>
+        <Typography variant="h6">MedAid Disha</Typography>
         <Typography variant="body1">Thank you for answering the questions.</Typography>
-        <Typography variant="body1">Average sentiment: {averageSentiment}</Typography>
+
+        <Typography variant="body1">Preliminary Result Analyzed: {averageSentiment=='positive'?"As per Analysis it seems like your are good state of mind. Be happy , be cheerful. However if you want , you can still contact any psychologist.":"As per analysis it seems like, you might need a professional pysochologist to sort out what you are going through. A psychologist will give you a better advice."}</Typography>
       </div>
     )}
+    </Paper>
+    
+    <Paper elevation={3} style={{margin:'20px', padding: '20px', height: '35vh', overflowY: 'auto' }}>
+    {/* Phone Number Input */}
+    {currentQuestionIndex === questions.length && (
+        <div>
+           <Typography variant="h6">Want to Take Professional Help?</Typography>
+        <Typography variant="body1">Help us by providing your Phone number and We will reach to you. Be free to talk and sort out all your quiries from our Psychologists at MedAid.</Typography>
+          <TextField
+            label="Enter your phone number"
+            variant="outlined"
+            fullWidth
+            value={phoneNumber}
+            onChange={(event) => setPhoneNumber(event.target.value)}
+            sx={{ marginTop: '10px' }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleUserResponse}
+            sx={{ marginTop: '10px' }}
+          >
+            Submit Phone Number
+          </Button>
+        </div>
+      )}
   </Paper>
 </Container>
   );

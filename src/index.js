@@ -2,12 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import ChatBotApp from './App';
+import WebcamEmotionAnalysis from './FaceAPI';
 import reportWebVitals from './reportWebVitals';
-
+import FaceEmotionDetector from './Face';
+import LandingPage from './LandingPage';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <ChatBotApp />
+    <ChatBotApp/>
   </React.StrictMode>
 );
 
